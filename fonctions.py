@@ -9,4 +9,3 @@ def string_to_binary(chaine):
 
     return encodage
 
-print(type(string_to_binary("test")))
