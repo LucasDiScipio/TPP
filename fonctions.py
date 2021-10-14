@@ -9,7 +9,7 @@ def string_to_binary(chaine):
         encodage.append(format(ord(char),'b'))
 
         # ajout d'un bit nul en debut de byte si le caractere ne requiert que 7 bits pour etre encode
-        if len(encodage[-1]) == 7:
+        while len(encodage[-1]) < 8:
             encodage[-1] = '0' + encodage[-1]
     
     return encodage
