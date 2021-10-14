@@ -1,6 +1,1 @@
 from fonctions import *
-
-
-
-
-
