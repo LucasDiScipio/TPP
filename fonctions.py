@@ -1,4 +1,5 @@
 from bitarray import *
+import pandas as pd
 
 def string_to_binary(chaine):
     """ Encode les caracteres de la chaine en mots de 8 bits
@@ -38,7 +39,6 @@ def add_mode_indicator(liste, mode):
     ------
     - liste :
     """
-    
     mode_indicators = {'numeric': bitarray('0001'), 
                        'alphanumeric': bitarray('0010'),
                        'byte': bitarray('0100'),
@@ -88,5 +88,30 @@ def add_character_count_indicator(chaine, liste, mode, version):
     
     # insertion de l'indicateur 
     liste.insert(1, character_count_indicator)
+
+    return liste
+
+
+def add_terminator(liste, version, EC_lvl):
+
+    # ouverture du fichier reprenant les nombres de bits du QR code en fonction de la version et du taux de corrections
+    df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
+
+    # nombre total de bits necessaires pour le QR code
+    version_and_EC_lvl = str(version) + '-' + EC_lvl
+    total_bits_number = 8*int(df_Error_correction_table.loc[version_and_EC_lvl]['Total Number of Data Codewords for this Version and EC Level'])
+    print(total_bits_number)
+
+    # calcul du nombre de bits de la liste
+    bits_number = 0
+    for word in liste:
+        bits_number += len(word)
+
+    print(bits_number)
+
+    # ajout des bits nuls eventuels en fin de message
+    terminator = bitarray(total_bits_number - bits_number)
+    terminator.setall(0)
+    liste = liste + [terminator]
 
     return liste
