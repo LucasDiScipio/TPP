@@ -110,7 +110,11 @@ def add_terminator(liste, version, EC_lvl):
     print(bits_number)
 
     # ajout des bits nuls eventuels en fin de message
-    terminator = bitarray(total_bits_number - bits_number)
+    if total_bits_number - bits_number >= 4:
+        terminator = bitarray(4)
+    else:
+        terminator = bitarray(total_bits_number - bits_number)
+    
     terminator.setall(0)
     liste = liste + [terminator]
 
