@@ -92,7 +92,7 @@ def add_character_count_indicator(chaine, liste, mode, version):
     return liste
 
 
-def add_terminator(liste, version, EC_lvl):
+def add_terminator_padBytes(liste, version, EC_lvl):
 
     # ouverture du fichier reprenant les nombres de bits du QR code en fonction de la version et du taux de corrections
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
@@ -100,13 +100,11 @@ def add_terminator(liste, version, EC_lvl):
     # nombre total de bits necessaires pour le QR code
     version_and_EC_lvl = str(version) + '-' + EC_lvl
     total_bits_number = 8*int(df_Error_correction_table.loc[version_and_EC_lvl]['Total Number of Data Codewords for this Version and EC Level'])
-    print(total_bits_number)
 
     # calcul du nombre de bits de la liste
     bits_number = 0
     for word in liste:
         bits_number += len(word)
-
     print(bits_number)
 
     # ajout des bits nuls eventuels en fin de message
@@ -117,5 +115,18 @@ def add_terminator(liste, version, EC_lvl):
     
     terminator.setall(0)
     liste = liste + [terminator]
+    bits_number += len(terminator)
+
+    # ajout des pad bytes eventuels en fin de message
+    remaining_capacity = total_bits_number - bits_number
+
+    pad_byte_1 = bitarray('11101100')
+    pad_byte_2 = bitarray('00010001')
+
+    # ajout des bits tq bits_number % 8 == 0
+    print(bits_number)
+    print(bits_number % 8)
+    if bits_number % 8 != 0:
+        liste = liste + [bitarray(bits_number % 8)]
 
     return liste

@@ -1,9 +1,9 @@
 from fonctions import *
 
-chaine = ""
-mode = "byte"
+chaine = "exemple"
+mode = "alphanumeric"
 version = 1
-EC_lvl = 'L'
+EC_lvl = 'Q'
 
 liste = string_to_binary(chaine)
 
@@ -17,7 +17,7 @@ liste = add_character_count_indicator(chaine, liste, mode, version)
 
 print(liste)
 
-liste = add_terminator(liste, version, EC_lvl)
+liste = add_terminator_padBytes(liste, version, EC_lvl)
 
 print(liste)
 
