@@ -139,3 +139,21 @@ def add_terminator_padBytes(liste, version, EC_lvl):
         compteur += 1
         
     return liste
+
+def data_encoding(chaine, mode, version, EC_lvl):
+    liste = string_to_binary(chaine)
+    liste = add_mode_indicator(liste, mode)
+    liste = add_character_count_indicator(chaine, liste, mode, version)
+    liste = add_terminator_padBytes(liste, version, EC_lvl)
+
+    data_codewords = bitarray()
+    for word in liste:
+        data_codewords += word
+
+    return data_codewords
+
+
+def break_data_codewords_into_blocks(data_codewords):
+
+    # ouverture du fichier reprenant les nombres de bits du QR code en fonction de la version et du taux de corrections
+    df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
