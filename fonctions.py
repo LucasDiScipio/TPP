@@ -105,28 +105,37 @@ def add_terminator_padBytes(liste, version, EC_lvl):
     bits_number = 0
     for word in liste:
         bits_number += len(word)
-    print(bits_number)
 
     # ajout des bits nuls eventuels en fin de message
     if total_bits_number - bits_number >= 4:
-        terminator = bitarray(4)
-    else:
-        terminator = bitarray(total_bits_number - bits_number)
+        terminator = 4*bitarray('0')
+    elif total_bits_number - bits_number !=0:
+        terminator = (total_bits_number - bits_number)*bitarray('0')
     
-    terminator.setall(0)
     liste = liste + [terminator]
     bits_number += len(terminator)
 
     # ajout des pad bytes eventuels en fin de message
-    remaining_capacity = total_bits_number - bits_number
+    # ajout des bits tq bits_number % 8 == 0
+    if bits_number % 8 != 0:
+        liste = liste + [(bits_number % 8)*bitarray('0')]
+        bits_number += bits_number % 8
 
+    # ajout des bits de sorte a atteindre la capacite maximum
+    remaining_capacity = total_bits_number - bits_number
     pad_byte_1 = bitarray('11101100')
     pad_byte_2 = bitarray('00010001')
+    
+    compteur = 1
+    while remaining_capacity > 0:
 
-    # ajout des bits tq bits_number % 8 == 0
-    print(bits_number)
-    print(bits_number % 8)
-    if bits_number % 8 != 0:
-        liste = liste + [bitarray(bits_number % 8)]
+        if compteur % 2 == 1:
+            liste = liste + [pad_byte_1]
+        
+        else:
+            liste = liste + [pad_byte_2]
 
+        remaining_capacity -= 8
+        compteur += 1
+        
     return liste
