@@ -1,5 +1,7 @@
+from classes import *
 from bitarray import *
 import pandas as pd
+import numpy as np
 
 def string_to_binary(chaine):
     """ Encode les caracteres de la chaine en mots de 8 bits
@@ -153,7 +155,48 @@ def data_encoding(chaine, mode, version, EC_lvl):
     return data_codewords
 
 
-def break_data_codewords_into_blocks(data_codewords):
+def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
 
-    # ouverture du fichier reprenant les nombres de bits du QR code en fonction de la version et du taux de corrections
+    # ouverture du fichier reprenant le nombre de groupes et de blocs par version et niveau de correction d'erreur
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
+
+    # separation en groupes
+    version_and_EC_lvl = str(version) + '-' + EC_lvl
+    groups_number = int(pd.notnull(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group 1'])) + int(pd.notnull(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group 2']))
+    groups_list = []
+    compteur = 0
+
+    for i in range(0,groups_number):
+        print("group: " + str(i+1))
+        blocks_number = int(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group ' + str(i+1)])
+        blocks_list = []
+
+        # separation en blocs
+        for j in range(0, blocks_number):
+            print('block: ' + str(j+1))
+            data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, "Number of Data Codewords in Each of Group " + str(j+1) + "'s Blocks"])
+            codewords_list = []
+
+            # separation en mots-codes
+            for k in range(0, data_codewords_number):
+
+                # ajout du mot code courant
+                codeword = data_codewords[compteur:compteur+7]
+                codewords_list.append(codeword)
+                
+                compteur += 8
+            
+            # ajout du bloc courant a la liste de blocs
+            blocks_list.append(Block(codewords_list, []))
+        
+        groups_list.append(Group(blocks_list))
+    
+    return groups_list
+
+
+
+
+
+
+    
+
