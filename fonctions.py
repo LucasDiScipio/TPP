@@ -8,11 +8,11 @@ def string_to_binary(chaine):
     
     INPUT
     -----
-    - chaine: une chaine de caracteres
+    - chaine: type -> string, la chaine de caractere a encoder
     
     OUTPUT
     ------
-    - encodage : liste contenant les mots de 8 bits qui encodent les caracteres
+    - encodage : type -> list, liste contenant les mots de 8 bits qui encodent les caracteres
     """
     
     # liste des caracteres de la chaine encodes en binaire
@@ -34,12 +34,12 @@ def add_mode_indicator(liste, mode):
     """ Ajoute le mode d'encodage au debut de liste
     INPUTS
     ------
-    - liste :
-    - mode :
+    - liste : type -> list, une liste de mots binaires 
+    - mode : type -> string, le mode d'encodage (numerique, alphanumerique, byte ou kanji)
 
     Return
     ------
-    - liste :
+    - liste : type -> list, une liste de mots binaires
     """
     mode_indicators = {'numeric': bitarray('0001'), 
                        'alphanumeric': bitarray('0010'),
@@ -52,6 +52,18 @@ def add_mode_indicator(liste, mode):
 
 
 def add_character_count_indicator(chaine, liste, mode, version):
+    """ Ajoute l'indicateur du nombre de caracteres
+    INPUTS
+    ------
+    - chaine : type -> string, la chaine de caractere a encoder
+    - liste : type -> list, une liste de mots binaires 
+    - mode : type -> string, le mode d'encodage (numerique, alphanumerique, byte ou kanji)
+    - version : type -> int, la version du QR code
+
+    Return
+    ------
+    - liste : type -> list, une liste de mots binaires
+    """
 
     character_count_indicator_dict = {
         # versions 1 a 9
@@ -95,7 +107,17 @@ def add_character_count_indicator(chaine, liste, mode, version):
 
 
 def add_terminator_padBytes(liste, version, EC_lvl):
+    """ Ajoute les eventuels bits afin d'atteindre la capacite maximale du QR code
+    INPUTS
+    ------
+    - liste : type -> list, une liste de mots binaires
+    - version : type -> int, la version du QR code
+    - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
 
+    Return
+    ------
+    - liste : type -> list, une liste de mots binaires
+    """
     # ouverture du fichier reprenant les nombres de bits du QR code en fonction de la version et du taux de corrections
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
 
@@ -143,6 +165,19 @@ def add_terminator_padBytes(liste, version, EC_lvl):
     return liste
 
 def data_encoding(chaine, mode, version, EC_lvl):
+    """ encode les donnees pour le mode d'encodage, la version et le niveau de correction du QR code
+    INPUTS
+    ------
+    - chaine : type -> string, la chaine de caractere a encoder
+    - mode : type -> string, le mode d'encodage (numerique, alphanumerique, byte ou kanji)
+    - version : type -> int, la version du QR code
+    - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
+
+    Return
+    ------
+    - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
+    """
+
     liste = string_to_binary(chaine)
     liste = add_mode_indicator(liste, mode)
     liste = add_character_count_indicator(chaine, liste, mode, version)
@@ -156,7 +191,17 @@ def data_encoding(chaine, mode, version, EC_lvl):
 
 
 def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
+    """ separe les mots codes par groupes, eux memes separes en blocs
+    INPUTS
+    ------
+    - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
+    - version : type -> int, la version du QR code
+    - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
 
+    Return
+    ------
+    - groups_list : type -> list, les groupes de blocs de mots codes
+    """
     # ouverture du fichier reprenant le nombre de groupes et de blocs par version et niveau de correction d'erreur
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
 
