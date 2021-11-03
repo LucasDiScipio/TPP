@@ -1,7 +1,9 @@
 from classes import *
 from bitarray import *
-import pandas as pd
+from bitarray.util import ba2int
+from numpy.polynomial import Polynomial
 import numpy as np
+import pandas as pd
 
 def string_to_binary(chaine):
     """ Encode les caracteres de la chaine en mots de 8 bits
@@ -212,13 +214,13 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     compteur = 0
 
     for i in range(0,groups_number):
-        print("group: " + str(i+1))
+        #print("group: " + str(i+1))
         blocks_number = int(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group ' + str(i+1)])
         blocks_list = []
 
         # separation en blocs
         for j in range(0, blocks_number):
-            print('block: ' + str(j+1))
+            #print('block: ' + str(j+1))
             data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, "Number of Data Codewords in Each of Group " + str(j+1) + "'s Blocks"])
             codewords_list = []
 
@@ -239,9 +241,21 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     return groups_list
 
 
+def generate_message_polynomial(block):
+    """ genere le polynome messager correspondant au bloc donne en argument
+    block : type -> Block, le bloc reprenant les mots codes qui serviront de coefficients au polynome messager
+    """
 
+    # recuperation des mots codes
+    codewords_list = block.codewords_list
 
+    # liste des coefficients du polynome messager
+    coefficients_list = []
+    for codeword in codewords_list:
+        coefficients_list.append(ba2int(codeword))
+    coefficients_list.reverse()
 
+    # generation du polynome messager
+    message_polynomial = Polynomial(coefficients_list)
 
-    
-
+    return message_polynomial
