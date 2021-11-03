@@ -34,12 +34,13 @@ def string_to_binary(chaine):
 
 def add_mode_indicator(liste, mode):
     """ Ajoute le mode d'encodage au debut de liste
+    
     INPUTS
     ------
     - liste : type -> list, une liste de mots binaires 
     - mode : type -> string, le mode d'encodage (numerique, alphanumerique, byte ou kanji)
 
-    Return
+    OUTPUT
     ------
     - liste : type -> list, une liste de mots binaires
     """
@@ -55,6 +56,7 @@ def add_mode_indicator(liste, mode):
 
 def add_character_count_indicator(chaine, liste, mode, version):
     """ Ajoute l'indicateur du nombre de caracteres
+    
     INPUTS
     ------
     - chaine : type -> string, la chaine de caractere a encoder
@@ -62,7 +64,7 @@ def add_character_count_indicator(chaine, liste, mode, version):
     - mode : type -> string, le mode d'encodage (numerique, alphanumerique, byte ou kanji)
     - version : type -> int, la version du QR code
 
-    Return
+    OUTPUT
     ------
     - liste : type -> list, une liste de mots binaires
     """
@@ -110,13 +112,14 @@ def add_character_count_indicator(chaine, liste, mode, version):
 
 def add_terminator_padBytes(liste, version, EC_lvl):
     """ Ajoute les eventuels bits afin d'atteindre la capacite maximale du QR code
+    
     INPUTS
     ------
     - liste : type -> list, une liste de mots binaires
     - version : type -> int, la version du QR code
     - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
 
-    Return
+    OUTPUT
     ------
     - liste : type -> list, une liste de mots binaires
     """
@@ -168,6 +171,7 @@ def add_terminator_padBytes(liste, version, EC_lvl):
 
 def data_encoding(chaine, mode, version, EC_lvl):
     """ encode les donnees pour le mode d'encodage, la version et le niveau de correction du QR code
+    
     INPUTS
     ------
     - chaine : type -> string, la chaine de caractere a encoder
@@ -175,7 +179,7 @@ def data_encoding(chaine, mode, version, EC_lvl):
     - version : type -> int, la version du QR code
     - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
 
-    Return
+    OUTPUT
     ------
     - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
     """
@@ -194,13 +198,14 @@ def data_encoding(chaine, mode, version, EC_lvl):
 
 def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     """ separe les mots codes par groupes, eux memes separes en blocs
+    
     INPUTS
     ------
     - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
     - version : type -> int, la version du QR code
     - EC_lvl : type -> str, le caractere correspondant au niveau de correction du QR code
 
-    Return
+    OUTPUT
     ------
     - groups_list : type -> list, les groupes de blocs de mots codes
     """
@@ -243,7 +248,14 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
 
 def generate_message_polynomial(block):
     """ genere le polynome messager correspondant au bloc donne en argument
+    
+    INPUT
+    ------
     block : type -> Block, le bloc reprenant les mots codes qui serviront de coefficients au polynome messager
+    
+    OUTPUT
+    ------
+    message_polynomial : type -> Polynomial, le polynome messager correspondant au bloc 'block'
     """
 
     # recuperation des mots codes
@@ -258,4 +270,17 @@ def generate_message_polynomial(block):
     # generation du polynome messager
     message_polynomial = Polynomial(coefficients_list)
 
-    return message_polynomial
+    return message_polynomial 
+
+
+def generate_generator_polynomial():
+    """ genere le polynome generateur pour le nombre de mots correcteurs donne en argument
+    
+    INPUT
+    ------
+    
+    
+    OUTPUT
+    ------
+    generator_polynomial : type -> Polynomial, le polynome generateur correspondant au nombre de mots correcteurs    
+    """
