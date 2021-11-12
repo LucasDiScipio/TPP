@@ -268,19 +268,58 @@ def generate_message_polynomial(block):
     coefficients_list.reverse()
 
     # generation du polynome messager
-    message_polynomial = Polynomial(coefficients_list)
+    message_polynomial = np.array(coefficients_list)
 
-    return message_polynomial 
+    return message_polynomial
 
 
-def generate_generator_polynomial():
-    """ genere le polynome generateur pour le nombre de mots correcteurs donne en argument
+def generate_generator_polynomial(degree, df_Antilog_table, df_Log_table):
+    """ genere les exposants des coefficients du polynome generateur 
+        pour le degre donne en argument
     
     INPUT
     ------
-    
+    degree : type -> int, le degre du polynome generateur
+    df_Antilog_table : type -> pandas DataFrame, table antilog
+    df_Log_table : type -> pandas DataFrame, table log
     
     OUTPUT
     ------
-    generator_polynomial : type -> Polynomial, le polynome generateur correspondant au nombre de mots correcteurs    
+    generator_polynomial : type -> numpy array, les exposants des coefficients du polynome generateur    
     """
+
+    # exposants des coefficients du polynome generateurs (initialisation)
+    coefficients_exponents = np.zeros(2, dtype=np.uint8)
+
+    # polynome generateur : (x-2^0)(x-2^1)...(x-2^{n-1})
+    for i in range(1,degree):
+
+        # multiplication par x^i
+        shifted_coefficients_exponents = np.append(coefficients_exponents, 0)
+
+        # multiplication par -2^i
+        for j in range(0,len(coefficients_exponents)):
+
+            if coefficients_exponents[j] + i > 255:
+                exponent = (coefficients_exponents[j] + i) % 255
+
+            else:
+                exponent = coefficients_exponents[j] + i  
+
+            # combiner les termes de memes degres
+            if j != len(coefficients_exponents)-1:
+                integer_counterpart = df_Antilog_table.loc[exponent]['integer'] ^ df_Antilog_table.loc[shifted_coefficients_exponents[j+1]]['integer']
+            
+            else:
+                integer_counterpart = df_Antilog_table.loc[exponent]['integer']
+
+            # retour a l'exposant
+            shifted_coefficients_exponents[j+1] = df_Log_table.loc[integer_counterpart]['exponent']
+
+        # mise a jour des exposants des coefficients
+        coefficients_exponents = shifted_coefficients_exponents
+    
+    # polynome generateur
+    generator_polynomial = coefficients_exponents
+
+    return generator_polynomial
