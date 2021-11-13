@@ -255,7 +255,7 @@ def generate_message_polynomial(block):
     
     OUTPUT
     ------
-    message_polynomial : type -> Polynomial, le polynome messager correspondant au bloc 'block'
+    message_polynomial : type -> numpy array, le polynome messager correspondant au bloc 'block'
     """
 
     # recuperation des mots codes
@@ -273,13 +273,13 @@ def generate_message_polynomial(block):
     return message_polynomial
 
 
-def generate_generator_polynomial(degree, df_Antilog_table, df_Log_table):
+def generate_generator_polynomial(degree_generator_polynomial, df_Antilog_table, df_Log_table):
     """ genere les exposants des coefficients du polynome generateur 
         pour le degre donne en argument
     
     INPUT
     ------
-    degree : type -> int, le degre du polynome generateur
+    degree_generator_polynomial : type -> int, le degre du polynome generateur
     df_Antilog_table : type -> pandas DataFrame, table antilog
     df_Log_table : type -> pandas DataFrame, table log
     
@@ -292,7 +292,7 @@ def generate_generator_polynomial(degree, df_Antilog_table, df_Log_table):
     coefficients_exponents = np.zeros(2, dtype=np.uint8)
 
     # polynome generateur : (x-2^0)(x-2^1)...(x-2^{n-1})
-    for i in range(1,degree):
+    for i in range(1,degree_generator_polynomial):
 
         # multiplication par x^i
         shifted_coefficients_exponents = np.append(coefficients_exponents, 0)
@@ -323,3 +323,62 @@ def generate_generator_polynomial(degree, df_Antilog_table, df_Log_table):
     generator_polynomial = coefficients_exponents
 
     return generator_polynomial
+
+
+def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+    """ genere les mots correcteurs a utiliser pour le polynome messager passe en argument
+    
+    INPUT
+    ------
+    message_polynomial : type -> numpy array, le polynome messager correspondant au bloc 'block'
+    generator_polynomial : type -> numpy array, les exposants des coefficients du polynome generateur 
+    df_Antilog_table : type -> pandas DataFrame, table antilog
+    df_Log_table : type -> pandas DataFrame, table log
+    
+    OUTPUT
+    ------
+    EC_correction_codewords : type -> numpy array, les coefficients entier du reste obtenu par division du polynome messager
+    """
+
+    # PREPARATION DE LA DIVISION POLYNOMIALE
+    # degre du polynome generateur
+    degree_generator_polynomial = len(generator_polynomial)-1
+
+    # degre du polynome messager
+    degree_message_polynomial = len(message_polynomial)-1
+
+    # multiplier le polynome messager par x^n
+    message_polynomial = np.append(message_polynomial, np.zeros(degree_generator_polynomial, dtype=np.uint8))
+
+    # DIVISION POLYNOMIALE
+    for n in range(degree_message_polynomial, -1, -1):
+
+        # 1. le polynome generateur doit presenter le meme degre que le polynome messager
+        generator_polynomial_prepared = np.append(generator_polynomial, np.zeros(n, dtype=np.uint8))
+
+        # 2. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
+        # 2.1 recuperer l'exposant du coefficient de tete du polynome generateur
+        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+
+        # 2.2 multiplication et conversion en notation entiere
+        for i in range(0,degree_generator_polynomial+1):
+
+            if generator_polynomial_prepared[i] + head_exponent > 255:
+                generator_polynomial_prepared[i] = (generator_polynomial_prepared[i] + head_exponent) % 255
+
+            else:
+                generator_polynomial_prepared[i] += head_exponent
+            
+            generator_polynomial_prepared[i] = df_Antilog_table.loc[generator_polynomial_prepared[i]]['integer']
+
+        # 3. polynome messager XOR polynome generateur
+        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))):
+
+            message_polynomial[i] = message_polynomial[i] ^ generator_polynomial_prepared[i]
+        
+        # suppression du 1er terme de coefficient nul
+        message_polynomial = message_polynomial[1:]
+
+    EC_correction_codewords = message_polynomial
+
+    return EC_correction_codewords
