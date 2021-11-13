@@ -169,6 +169,7 @@ def add_terminator_padBytes(liste, version, EC_lvl):
         
     return liste
 
+
 def data_encoding(chaine, mode, version, EC_lvl):
     """ encode les donnees pour le mode d'encodage, la version et le niveau de correction du QR code
     
@@ -340,6 +341,9 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
     EC_correction_codewords : type -> numpy array, les coefficients entier du reste obtenu par division du polynome messager
     """
 
+    print(message_polynomial)
+    print(generator_polynomial)
+
     # PREPARATION DE LA DIVISION POLYNOMIALE
     # degre du polynome generateur
     degree_generator_polynomial = len(generator_polynomial)-1
@@ -358,7 +362,8 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
 
         # 2. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
         # 2.1 recuperer l'exposant du coefficient de tete du polynome generateur
-        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+        print('head_exponent :' + str(message_polynomial[0]))
+        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent'] #\\SABUGSAMER\\
 
         # 2.2 multiplication et conversion en notation entiere
         for i in range(0,degree_generator_polynomial+1):
@@ -372,12 +377,18 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
             generator_polynomial_prepared[i] = df_Antilog_table.loc[generator_polynomial_prepared[i]]['integer']
 
         # 3. polynome messager XOR polynome generateur
-        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))):
-
+        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\LABORNEMINPUELAMERDE\\
+        # for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\FAIL1\\
+        # counter = 0
+        # while generator_polynomial_prepared[counter] != 0: #\\FAIL2\\
             message_polynomial[i] = message_polynomial[i] ^ generator_polynomial_prepared[i]
         
         # suppression du 1er terme de coefficient nul
         message_polynomial = message_polynomial[1:]
+        print('generator_polynomial_prepared (loop) :', end=' ')
+        print(generator_polynomial_prepared)
+        print('message polynomial (loop) :', end=' ')
+        print(message_polynomial)
 
     EC_correction_codewords = message_polynomial
 
