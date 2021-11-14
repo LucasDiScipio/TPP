@@ -377,14 +377,20 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
             generator_polynomial_prepared[i] = df_Antilog_table.loc[generator_polynomial_prepared[i]]['integer']
 
         # 3. polynome messager XOR polynome generateur
-        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\LABORNEMINPUELAMERDE\\
         # for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\FAIL1\\
         # counter = 0
-        # while generator_polynomial_prepared[counter] != 0: #\\FAIL2\\
+        # while generator_polynomial_prepared[counter] != 0: \\FAIL2\\
+        # for i in range(0,max(n+1, degree_generator_polynomial)): \\FAIL3\\ 
+        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\LABORNEMINPUELAMERDE\\
+        
             message_polynomial[i] = message_polynomial[i] ^ generator_polynomial_prepared[i]
         
         # suppression du 1er terme de coefficient nul
         message_polynomial = message_polynomial[1:]
+        # print('np.where(message_polynomial==0) :', end=' ')
+        # print(np.where(message_polynomial==0)[0][0])
+        # print('np.where(generator_polynomial_prepared==0) :', end=' ')
+        # print(np.where(generator_polynomial_prepared==0)[0][0])
         print('generator_polynomial_prepared (loop) :', end=' ')
         print(generator_polynomial_prepared)
         print('message polynomial (loop) :', end=' ')

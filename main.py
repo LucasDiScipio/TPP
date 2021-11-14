@@ -42,7 +42,7 @@ for i in range(0,len(groups_list)):
     # bloc courant
     for j in range(len(groups_list[i].blocks_list)):
         
-        print('group : ' + str(i+1) + ' - bloc : ' + str(j))
+        print('================== group : ' + str(i+1) + ' - bloc : ' + str(j) + '==================')
         
         # polynome messager
         block = groups_list[i].blocks_list[j]
