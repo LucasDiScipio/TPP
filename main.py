@@ -42,7 +42,7 @@ for i in range(0,len(groups_list)):
     # bloc courant
     for j in range(len(groups_list[i].blocks_list)):
         
-        print('================== group : ' + str(i+1) + ' - bloc : ' + str(j) + '==================')
+        print('================== groupe : ' + str(i+1) + ' - bloc : ' + str(j+1) + ' ==================')
         
         # polynome messager
         block = groups_list[i].blocks_list[j]
@@ -53,4 +53,6 @@ for i in range(0,len(groups_list)):
         generator_polynomial = generate_generator_polynomial(degree_generator_polynomial, df_Antilog_table, df_Log_table)
 
         # mots correcteurs
+        # groups_list[i].blocks_list[j].EC_codewords_list = EC_codewords_generator_old(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table)
         groups_list[i].blocks_list[j].EC_codewords_list = EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table)
+

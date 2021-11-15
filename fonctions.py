@@ -326,7 +326,7 @@ def generate_generator_polynomial(degree_generator_polynomial, df_Antilog_table,
     return generator_polynomial
 
 
-def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+def EC_codewords_generator_v1(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
     """ genere les mots correcteurs a utiliser pour le polynome messager passe en argument
     
     INPUT
@@ -341,61 +341,182 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
     EC_correction_codewords : type -> numpy array, les coefficients entier du reste obtenu par division du polynome messager
     """
 
+    # print(message_polynomial)
+    # print(generator_polynomial)
+
+    # # PREPARATION DE LA DIVISION POLYNOMIALE
+    # # degre du polynome generateur
+    # degree_generator_polynomial = len(generator_polynomial)-1
+
+    # # degre du polynome messager
+    # degree_message_polynomial = len(message_polynomial)-1
+
+    # # multiplier le polynome messager par x^n
+    # message_polynomial = np.append(message_polynomial, np.zeros(degree_generator_polynomial, dtype=np.uint8))
+
+    # # DIVISION POLYNOMIALE
+    # for n in range(degree_message_polynomial, -1, -1):
+
+    #     # 1. le polynome generateur doit presenter le meme degre que le polynome messager
+    #     generator_polynomial_prepared = np.append(generator_polynomial, np.zeros(n, dtype=np.uint8))
+
+    #     # 2. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
+    #     # 2.1 recuperer l'exposant du coefficient de tete du polynome generateur
+    #     print('head_exponent :' + str(message_polynomial[0]))
+    #     head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent'] #\\SABUGSAMER\\
+
+    #     # 2.2 multiplication et conversion en notation entiere
+    #     for i in range(0,degree_generator_polynomial+1):
+
+    #         if generator_polynomial_prepared[i] + head_exponent > 255:
+    #             generator_polynomial_prepared[i] = (generator_polynomial_prepared[i] + head_exponent) % 255
+
+    #         else:
+    #             generator_polynomial_prepared[i] += head_exponent
+            
+    #         generator_polynomial_prepared[i] = df_Antilog_table.loc[generator_polynomial_prepared[i]]['integer']
+
+    #     # 3. polynome messager XOR polynome generateur
+    #     # for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\FAIL1\\
+    #     # counter = 0
+    #     # while generator_polynomial_prepared[counter] != 0: \\FAIL2\\
+    #     # for i in range(0,max(n+1, degree_generator_polynomial)): \\FAIL3\\ 
+    #     for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\LABORNEMINPUELAMERDE\\
+        
+    #         message_polynomial[i] = message_polynomial[i] ^ generator_polynomial_prepared[i]
+        
+    #     # suppression du 1er terme de coefficient nul
+    #     message_polynomial = message_polynomial[1:]
+    #     # print('np.where(message_polynomial==0) :', end=' ')
+    #     # print(np.where(message_polynomial==0)[0][0])
+    #     # print('np.where(generator_polynomial_prepared==0) :', end=' ')
+    #     # print(np.where(generator_polynomial_prepared==0)[0][0])
+    #     print('generator_polynomial_prepared (loop) :', end=' ')
+    #     print(generator_polynomial_prepared)
+    #     print('message polynomial (loop) :', end=' ')
+    #     print(message_polynomial)
+
+    # EC_correction_codewords = message_polynomial
+
+    # return EC_correction_codewords
+
+
+def EC_codewords_generator_v2(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+    
+    
+    # print(message_polynomial)
+    # print(generator_polynomial)    
+
+    # # PREPARATION DE LA DIVISION POLYNOMIALE
+    # # degre du polynome generateur
+    # degree_generator_polynomial = len(generator_polynomial)-1
+
+    # # degre du polynome messager
+    # degree_message_polynomial = len(message_polynomial)-1
+
+    # # DIVISION POLYNOMIALE
+    # for n in range(degree_message_polynomial, -1, -1):
+
+    #     # 1. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
+    #     # 1.1 recuperer l'exposant du coefficient de tete du polynome generateur
+    #     head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+
+    #     # 1.2 multiplication et conversion en notation entiere
+    #     for i in range(0,degree_generator_polynomial+1):
+
+    #         if generator_polynomial[i] + head_exponent > 255:
+    #             generator_polynomial[i] = (generator_polynomial[i] + head_exponent) % 255
+
+    #         else:
+    #             generator_polynomial[i] += head_exponent
+            
+    #         generator_polynomial[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
+
+    #     print('message_polynomial (pre xor)')
+    #     print(message_polynomial)
+
+    #     print('generator polynomial')
+    #     print(generator_polynomial)
+
+    #     # 2. polynome messager XOR polynome generateur
+    #     print('max : ' + str(max(len(generator_polynomial), len(message_polynomial))))
+    #     for i in range(0, max(len(generator_polynomial), len(message_polynomial))):
+            
+    #         # if i < len(message_polynomial) and i < len(generator_polynomial):
+    #         #     message_polynomial[i] = message_polynomial[i] ^ generator_polynomial[i]
+            
+    #         # elif i > len(generator_polynomial):
+    #         #     message_polynomial[i] = message_polynomial[i] ^ 0
+
+    #         # elif i > len(message_polynomial):
+    #         #     message_polynomial[i] = 0 ^ generator_polynomial[i]
+
+    #         if 
+
+    #     # suppression du 1er terme (coefficient nul)
+    #     message_polynomial = message_polynomial[1:]
+        
+    #     print('message_polynomial (post xor)')
+    #     print(message_polynomial)
+
+    # return []
+    return []
+
+
+def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+    
     print(message_polynomial)
-    print(generator_polynomial)
+    
+    # nombre de termes du polynome generateur
+    m = len (generator_polynomial)
 
-    # PREPARATION DE LA DIVISION POLYNOMIALE
-    # degre du polynome generateur
-    degree_generator_polynomial = len(generator_polynomial)-1
+    # le nombre d'etapes dans la division est egal au nombre de termes du le polynome messager
+    for k in range(0,len(message_polynomial)):
+        
+        # 1. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
+        # 1.1 recuperer l'exposant du coefficient de tete du polynome generateur
+        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
 
-    # degre du polynome messager
-    degree_message_polynomial = len(message_polynomial)-1
+        # 1.2 multiplication et conversion en notation entiere
+        generator_polynomial_XOR = generator_polynomial
+        for i in range(0,m):
 
-    # multiplier le polynome messager par x^n
-    message_polynomial = np.append(message_polynomial, np.zeros(degree_generator_polynomial, dtype=np.uint8))
-
-    # DIVISION POLYNOMIALE
-    for n in range(degree_message_polynomial, -1, -1):
-
-        # 1. le polynome generateur doit presenter le meme degre que le polynome messager
-        generator_polynomial_prepared = np.append(generator_polynomial, np.zeros(n, dtype=np.uint8))
-
-        # 2. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
-        # 2.1 recuperer l'exposant du coefficient de tete du polynome generateur
-        print('head_exponent :' + str(message_polynomial[0]))
-        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent'] #\\SABUGSAMER\\
-
-        # 2.2 multiplication et conversion en notation entiere
-        for i in range(0,degree_generator_polynomial+1):
-
-            if generator_polynomial_prepared[i] + head_exponent > 255:
-                generator_polynomial_prepared[i] = (generator_polynomial_prepared[i] + head_exponent) % 255
+            if generator_polynomial_XOR[i] + head_exponent > 255:
+                # generator_polynomial[i] = (generator_polynomial[i] + head_exponent) % 255
+                generator_polynomial_XOR[i] = (generator_polynomial_XOR[i] + head_exponent) % 255
 
             else:
-                generator_polynomial_prepared[i] += head_exponent
+                # generator_polynomial[i] += head_exponent
+                generator_polynomial_XOR[i] += head_exponent
             
-            generator_polynomial_prepared[i] = df_Antilog_table.loc[generator_polynomial_prepared[i]]['integer']
+            # generator_polynomial[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
+            generator_polynomial_XOR[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
+        
 
-        # 3. polynome messager XOR polynome generateur
-        # for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\FAIL1\\
-        # counter = 0
-        # while generator_polynomial_prepared[counter] != 0: \\FAIL2\\
-        # for i in range(0,max(n+1, degree_generator_polynomial)): \\FAIL3\\ 
-        for i in range(0,min(degree_message_polynomial+1, len(message_polynomial))): #\\LABORNEMINPUELAMERDE\\
         
-            message_polynomial[i] = message_polynomial[i] ^ generator_polynomial_prepared[i]
+        # print('message_polynomial (pre xor)')
+        # print(message_polynomial)
+
+        # print('generator polynomial')
+        # print(generator_polynomial)
+
+        # 2. polynome messager XOR polynome generateur
+        message_polynomial_XOR = message_polynomial
+        # generator_polynomial_XOR = generator_polynomial
+
+        # 2.1 ajouts des termes nuls eventuels du polynome generateur
+        if len(message_polynomial_XOR) > len(generator_polynomial_XOR):
+            generator_polynomial_XOR = np.append(generator_polynomial_XOR, np.zeros(len(message_polynomial_XOR) - len(generator_polynomial_XOR), dtype=np.uint8))
+
+        # 2.2 ajouts des termes nuls eventuels du polynome messager
+        if len(message_polynomial_XOR) < len(generator_polynomial_XOR):
+            message_polynomial_XOR = np.append(message_polynomial_XOR, np.zeros(len(generator_polynomial_XOR) - len(message_polynomial_XOR), dtype=np.uint8))
+
+        # 2.3 XOR
+        for i in range(0,len(message_polynomial_XOR)):
+            message_polynomial_XOR[i] = message_polynomial_XOR[i] ^ generator_polynomial_XOR[i]
         
-        # suppression du 1er terme de coefficient nul
-        message_polynomial = message_polynomial[1:]
-        # print('np.where(message_polynomial==0) :', end=' ')
-        # print(np.where(message_polynomial==0)[0][0])
-        # print('np.where(generator_polynomial_prepared==0) :', end=' ')
-        # print(np.where(generator_polynomial_prepared==0)[0][0])
-        print('generator_polynomial_prepared (loop) :', end=' ')
-        print(generator_polynomial_prepared)
-        print('message polynomial (loop) :', end=' ')
+        message_polynomial = message_polynomial_XOR[1:]
         print(message_polynomial)
-
-    EC_correction_codewords = message_polynomial
-
-    return EC_correction_codewords
+    
+    return []
