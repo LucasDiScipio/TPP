@@ -463,9 +463,10 @@ def EC_codewords_generator_v2(message_polynomial, generator_polynomial, df_Antil
     return []
 
 
-def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+def EC_codewords_generator_v3(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
     
-    print(message_polynomial)
+    message_polynomial_XOR = message_polynomial
+    print(message_polynomial_XOR)
     
     # nombre de termes du polynome generateur
     m = len (generator_polynomial)
@@ -475,7 +476,8 @@ def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antil
         
         # 1. multiplier le polynome generateur par le coefficient du terme de plus haut degre du polynome messager
         # 1.1 recuperer l'exposant du coefficient de tete du polynome generateur
-        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+        # head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+        head_exponent = df_Log_table.loc[message_polynomial_XOR[0]]['exponent']
 
         # 1.2 multiplication et conversion en notation entiere
         generator_polynomial_XOR = generator_polynomial
@@ -492,8 +494,6 @@ def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antil
             # generator_polynomial[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
             generator_polynomial_XOR[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
         
-
-        
         # print('message_polynomial (pre xor)')
         # print(message_polynomial)
 
@@ -501,7 +501,7 @@ def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antil
         # print(generator_polynomial)
 
         # 2. polynome messager XOR polynome generateur
-        message_polynomial_XOR = message_polynomial
+        # message_polynomial_XOR = message_polynomial
         # generator_polynomial_XOR = generator_polynomial
 
         # 2.1 ajouts des termes nuls eventuels du polynome generateur
@@ -516,7 +516,68 @@ def EC_codewords_generator_V3(message_polynomial, generator_polynomial, df_Antil
         for i in range(0,len(message_polynomial_XOR)):
             message_polynomial_XOR[i] = message_polynomial_XOR[i] ^ generator_polynomial_XOR[i]
         
-        message_polynomial = message_polynomial_XOR[1:]
+        # message_polynomial = message_polynomial_XOR[1:]
+        message_polynomial_XOR = message_polynomial_XOR[1:]
         print(message_polynomial)
     
-    return []
+    return message_polynomial
+
+
+def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table):
+
+    # nombre de termes du polynome generateur
+    m = len(generator_polynomial)
+
+    # le nombre d'etapes dans la division correspond au nombre de termes du polynome generateur
+    steps = len(message_polynomial)
+    k=0
+    while k < steps:
+
+        # nombre de termes du polynome messager
+        n = len(message_polynomial)
+
+        # multiplier le polynome generateur par le coefficient de tete du polynome messager
+        head_exponent = df_Log_table.loc[message_polynomial[0]]['exponent']
+
+        for i in range(0,m):
+
+            if generator_polynomial[i] + head_exponent > 255:
+                generator_polynomial[i] = (generator_polynomial[i] + head_exponent) % 255
+
+            else:
+                generator_polynomial[i] += head_exponent
+            
+            generator_polynomial[i] = df_Antilog_table.loc[generator_polynomial[i]]['integer']
+
+        # division polynomiale (XOR)
+        for i in range(0,min(m,n)):
+
+            message_polynomial[i] = message_polynomial[i] ^ generator_polynomial[i]
+        
+
+        if n < m: 
+            
+            message_polynomial = np.append(message_polynomial, np.zeros(m-n, dtype=np.uint8))
+
+            for i in range(n, n+(m-n)):
+                message_polynomial[i] = message_polynomial[i] ^ generator_polynomial[i]
+
+        
+        if n > m:
+
+            for i in range(n, n + (m-n)):
+                message_polynomial[i] = message_polynomial[i] ^ 0
+
+        # message_polynomial = message_polynomial[1:]
+
+        while message_polynomial[0] == 0:
+            message_polynomial = message_polynomial[1:]
+            k += 1
+
+        # reset polynome generateur
+        generator_polynomial = generate_generator_polynomial(m-1, df_Antilog_table, df_Log_table)
+
+        print('etape ' + str(k+1), end=' :')
+        print(message_polynomial)
+
+    return message_polynomial

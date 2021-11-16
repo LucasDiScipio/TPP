@@ -47,10 +47,14 @@ for i in range(0,len(groups_list)):
         # polynome messager
         block = groups_list[i].blocks_list[j]
         message_polynomial = generate_message_polynomial(block)
+        print('message_polynomial : ')
+        print(message_polynomial)
 
         # polynome generateur
         degree_generator_polynomial = int(df_Error_correction_table.loc[version_and_EC_lvl, 'EC Codewords Per Block'])
         generator_polynomial = generate_generator_polynomial(degree_generator_polynomial, df_Antilog_table, df_Log_table)
+        print('generator_polynomial')
+        print(generator_polynomial)
 
         # mots correcteurs
         # groups_list[i].blocks_list[j].EC_codewords_list = EC_codewords_generator_old(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table)
