@@ -219,15 +219,17 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     groups_list = []
     compteur = 0
 
+    # print(f"groups_number : {groups_number}")
+
     for i in range(0,groups_number):
-        #print("group: " + str(i+1))
         blocks_number = int(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group ' + str(i+1)])
+        print(f"blocks_number: {blocks_number}")        
         blocks_list = []
+        data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, "Number of Data Codewords in Each of Group " + str(i+1) + "'s Blocks"])
 
         # separation en blocs
         for j in range(0, blocks_number):
-            #print('block: ' + str(j+1))
-            data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, "Number of Data Codewords in Each of Group " + str(j+1) + "'s Blocks"])
+
             codewords_list = []
 
             # separation en mots-codes
@@ -371,7 +373,6 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
             for i in range(n, n + (m-n)):
                 message_polynomial[i] = message_polynomial[i] ^ 0
 
-        # message_polynomial = message_polynomial[1:]
 
         while message_polynomial[0] == 0:
             message_polynomial = message_polynomial[1:]
@@ -379,8 +380,7 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
 
         # reset polynome generateur
         generator_polynomial = generate_generator_polynomial(m-1, df_Antilog_table, df_Log_table)
-
-        print('etape ' + str(k+1), end=' :')
-        print(message_polynomial)
+    
+    # print(f"remainder : {message_polynomial}")
 
     return message_polynomial
