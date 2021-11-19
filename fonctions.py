@@ -219,17 +219,15 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     groups_list = []
     compteur = 0
 
-    # print(f"groups_number : {groups_number}")
-
     for i in range(0,groups_number):
-        blocks_number = int(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group ' + str(i+1)])
-        print(f"blocks_number: {blocks_number}")        
+
+        blocks_number = int(df_Error_correction_table.loc[version_and_EC_lvl, f"Number of Blocks in Group {i+1}"])
         blocks_list = []
-        data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, "Number of Data Codewords in Each of Group " + str(i+1) + "'s Blocks"])
 
         # separation en blocs
         for j in range(0, blocks_number):
 
+            data_codewords_number = int(df_Error_correction_table.loc[version_and_EC_lvl, f"Number of Data Codewords in Each of Group {i+1}'s Blocks"])
             codewords_list = []
 
             # separation en mots-codes
@@ -380,7 +378,74 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
 
         # reset polynome generateur
         generator_polynomial = generate_generator_polynomial(m-1, df_Antilog_table, df_Log_table)
-    
-    # print(f"remainder : {message_polynomial}")
 
     return message_polynomial
+
+
+def final_message(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits):
+
+    # ENTRELACEMENT
+    interleaved_data = []
+
+    # nombre total de blocs
+    blocks_total_number = 0
+    for i in range(1,groups_number+1):
+        blocks_total_number += int(df_Error_correction_table.loc[version_and_EC_lvl, f"Number of Blocks in Group {i}"])
+
+    # longueur max des mots codes
+    codewords_max_size = int(df_Error_correction_table.loc[version_and_EC_lvl, f"Number of Data Codewords in Each of Group {groups_number}'s Blocks"])
+
+    # matrice des mots codes (-1 -> valeur manquante)
+    codewords_matrix = np.ones((blocks_total_number,codewords_max_size), dtype=np.uint8)*(-1)
+
+    # matrice des mots correcteurs
+    EC_codewords_matrix = np.zeros((blocks_total_number, degree_generator_polynomial), dtype=np.uint8)
+
+    # groupe courant
+    index = 0
+    for i in range(0,groups_number):
+
+        # bloc courant
+        for j in range(0,len(groups_list[i].blocks_list)):
+            
+            for k in range(0,len(groups_list[i].blocks_list[j].codewords_list)):
+
+                codewords_matrix[index,k] = ba2int(groups_list[i].blocks_list[j].codewords_list[k])
+            
+            EC_codewords_matrix[index] = groups_list[i].blocks_list[j].EC_codewords_list
+
+            index += 1
+
+    # entrelacement des mots codes
+    for i in range(0,codewords_matrix.shape[1]):
+
+        for j in range(0, codewords_matrix.shape[0]):
+
+            if codewords_matrix[j,i] != -1:
+
+                interleaved_data.append(codewords_matrix[j,i])
+
+    # entrelacement des mots correcteurs
+    for i in range(0, EC_codewords_matrix.shape[1]):
+
+        for j in range(0, EC_codewords_matrix.shape[0]):
+
+            interleaved_data.append(EC_codewords_matrix[j,i])
+
+    # conversion du message final en notation binaire
+    final_message_list = []
+    final_message = bitarray()
+    for word in interleaved_data:
+
+        final_message_list.append(bitarray(format(word,'b')))
+
+        # ajout eventuel de bits nuls de sorte a obtenir des mots de 8 bits
+        while len(final_message_list[-1]) < 8:
+            final_message_list[-1] = bitarray('0') + final_message_list[-1]
+
+        final_message += final_message_list[-1]
+
+    # ajout eventuel de bits requis
+    final_message += int(df_Versions_Required_Remainder_Bits.loc[version])*bitarray('0')
+
+    return final_message
