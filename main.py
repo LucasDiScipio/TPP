@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 
 # parametres pour la generation du QR code
-chaine = "test"
+chaine = "kichta"
 mode = "byte"
 version = 7
-EC_lvl = 'H'
+EC_lvl = 'Q'
 version_and_EC_lvl = str(version) + '-' + EC_lvl
 
 # Error Correction Table

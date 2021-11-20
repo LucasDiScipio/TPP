@@ -1,5 +1,6 @@
 from typing import final
 from main import final_message, version
+from fonctions import mask
 from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
@@ -131,9 +132,6 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
 
         current_coordonates[1] -= 1
         pattern_placement[1] = 'up-right'
-
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
         
 
     elif pattern_placement == ['upward', 'up-right']:
@@ -142,26 +140,18 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
         current_coordonates[1] += 1
         pattern_placement[1] = 'left'
 
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
 
     elif pattern_placement == ['downward', 'left']:
 
         current_coordonates[1] -= 1
         pattern_placement[1] = 'down-right'       
 
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
 
     elif pattern_placement == ['downward', 'down-right']:
 
         current_coordonates[0] += 1
         current_coordonates[1] += 1
         pattern_placement[1] = 'left'    
-
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
-
 
     # changement du sens vertical : upward -> downward
     if  current_coordonates[0] == 0 and pattern_placement[1] == 'up-right':
@@ -182,14 +172,7 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
             current_coordonates[1] -= 1
 
         else:
-            print(" ")
-            print("TIMING PATTERN")
-            print(" ")
             current_coordonates[1] -= 2
-        
-        print("upward -> downward")
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
 
 
     # changement du sens vertical : downward -> upward
@@ -206,14 +189,11 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
 
         pattern_placement = ['upward', 'left']
         current_coordonates[1] -= 1
-
-        print("downward -> upward")
-        print(f"current_coordonates : {current_coordonates}")
-        print(f"pattern_placement : {pattern_placement}")
-
         
-        
-# print(QR_Code_Matrix)
+
+# DETERMINING THE BEST MASK
+# Evaluation Condition #1
+
 
 # AFFICHAGE
 fig, ax = plt.subplots()

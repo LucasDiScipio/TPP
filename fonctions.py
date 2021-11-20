@@ -449,3 +449,32 @@ def final_message(version, version_and_EC_lvl, degree_generator_polynomial, grou
     final_message += int(df_Versions_Required_Remainder_Bits.loc[version])*bitarray('0')
 
     return final_message
+
+
+def mask(mask_number, row, column, bit):
+
+    if mask_number == 0 and (row + column) % 2 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 1 and row % 2 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 2 and column % 3 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 3 and (row + column) % 3 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 4 and (np.floor(row / 2) + np.floor(column/3) ) % 2 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 5 and ((row * column) % 2) + ((row * column) % 3) == 0 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 6 and ( ((row * column) % 2) + ((row * column) % 3) ) % 2 == 0:
+        bit = bit ^ 1
+ 
+    elif mask_number == 7 and ( ((row + column) % 2) + ((row * column) % 3) ) % 2 == 0:
+        bit = bit ^ 1
+
+    return bit
