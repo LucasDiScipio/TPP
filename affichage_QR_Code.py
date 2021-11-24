@@ -1,6 +1,6 @@
 from typing import final
 from main import final_message, version
-from fonctions import mask
+from fonctions import mask, data_masking_condition_1
 from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
@@ -115,7 +115,6 @@ pattern_placement = ['upward', 'left']
 
 # PATTERN PLACEMENT
 stop = 0
-# while current_coordonates != [QR_Code_size-1,0]:
 while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
 
     # le module courant est disponible
@@ -192,11 +191,26 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
         
 
 # DETERMINING THE BEST MASK
+
+# remplacement des zones reservees pour l'implementation du data masking
+QR_Code_Matrix[QR_Code_Matrix == .7] = 0
+QR_Code_Matrix[QR_Code_Matrix == .3] = 0
+
+np.set_printoptions(threshold=np.inf)
+print(QR_Code_Matrix)
+
 # Evaluation Condition #1
+penalty = data_masking_condition_1(QR_Code_Matrix[11,:], QR_Code_size)
+print(penalty)
 
 
 # AFFICHAGE
 fig, ax = plt.subplots()
-ax.imshow(QR_Code_Matrix, cmap='Greys')
+ax.imshow(QR_Code_Matrix, cmap='Greys', aspect='auto')
 ax.set_aspect('equal')
+ax.set_xticks(np.arange(0,QR_Code_size)-.5)
+ax.set_yticks(np.arange(0,QR_Code_size)-.5)
+ax.axes.xaxis.set_ticklabels([])
+ax.axes.yaxis.set_ticklabels([])
+ax.grid()
 plt.show()
