@@ -382,7 +382,7 @@ def EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_
     return message_polynomial
 
 
-def final_message(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits):
+def final_message_generator(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits):
 
     # ENTRELACEMENT
     interleaved_data = []
@@ -483,7 +483,7 @@ def data_masking_condition_1(QR_Code_row_or_column, QR_Code_size):
 
     penalty = 0
     i = 0
-    while i <= QR_Code_size-5:
+    while i <= QR_Code_size-6:
 
         if np.min(QR_Code_row_or_column[i:i+5]) == np.max(QR_Code_row_or_column[i:i+5]):
             
@@ -507,3 +507,24 @@ def data_masking_condition_1(QR_Code_row_or_column, QR_Code_size):
             i += 1
     
     return penalty
+
+def data_masking_condition_2(QR_Code_Matrix_subblock):
+    
+    penalty = 0
+
+    if np.max(QR_Code_Matrix_subblock[0:0+2,0:0+2]) == np.min(QR_Code_Matrix_subblock[0:0+2,0:0+2]):
+        penalty = 3
+
+    return penalty
+
+def data_masking_condition_3(QR_code_Matrix_band):
+
+    penalty = 0
+    pattern = np.array([1,0,1,1,1,0,1,0,0,0,0], dtype=np.float64)
+
+    if (QR_code_Matrix_band==pattern).all() or (np.flipud(QR_code_Matrix_band)==pattern).all():
+
+        penalty += 40
+
+    return penalty
+

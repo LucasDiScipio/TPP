@@ -1,6 +1,7 @@
 from typing import final
 from main import final_message, version
-from fonctions import mask, data_masking_condition_1
+# from fonctions import mask, data_masking_condition_1
+from fonctions import *
 from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
@@ -196,21 +197,69 @@ while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
 QR_Code_Matrix[QR_Code_Matrix == .7] = 0
 QR_Code_Matrix[QR_Code_Matrix == .3] = 0
 
-np.set_printoptions(threshold=np.inf)
-print(QR_Code_Matrix)
+# np.set_printoptions(threshold=np.inf)
+# print(QR_Code_Matrix)
 
 # Evaluation Condition #1
-penalty = data_masking_condition_1(QR_Code_Matrix[11,:], QR_Code_size)
-print(penalty)
+penalty_condition_1 = 0
+for i in range(0,QR_Code_size):
 
+    # lignes
+    penalty_condition_1 += data_masking_condition_1(QR_Code_Matrix[i,:], QR_Code_size)
+
+    # colonnes
+    penalty_condition_1 += data_masking_condition_1(QR_Code_Matrix[:,i], QR_Code_size)
+
+
+# Evaluation Condition #2
+penalty_condition_2 = 0
+for i in range(0,QR_Code_size-1):
+
+    for j in range(0,QR_Code_size-1):
+
+        penalty_condition_2 += data_masking_condition_2(QR_Code_Matrix[i:i+2,j:j+2])
+
+
+# Evaluation Condition #3
+penalty_condition_3 = 0
+for i in range(0, QR_Code_size):
+
+    for j in range(0, QR_Code_size-11):
+
+        # lignes
+        penalty_condition_3 += data_masking_condition_3(QR_Code_Matrix[i, j:j+11])
+
+        # colonnes
+        penalty_condition_3 += data_masking_condition_3(QR_Code_Matrix[j:j+11, i])
+
+
+# Evaluation Condition #4
+# nombre de modules noirs
+dark_modules_number = np.count_nonzero(QR_Code_Matrix == 1)
+
+# nombre de modules
+modules_number = QR_Code_size ** 2
+
+# (modules noirs / modules) * 100
+dark_modules_ratio = dark_modules_number / modules_number * 100
+
+# multiples de 5 précédents et suivants
+previous_5_multiple = np.floor(dark_modules_ratio/5)*5
+next_5_multiple = np.ceil(dark_modules_ratio/5)*5
+
+# calcul de la penalite
+penalty_condition_4 = min(abs(previous_5_multiple-50), abs(next_5_multiple-50))*2
+
+penalty_score = penalty_condition_1 + penalty_condition_2 + penalty_condition_3 + penalty_condition_4
+print(penalty_score)
 
 # AFFICHAGE
 fig, ax = plt.subplots()
-ax.imshow(QR_Code_Matrix, cmap='Greys', aspect='auto')
-ax.set_aspect('equal')
 ax.set_xticks(np.arange(0,QR_Code_size)-.5)
 ax.set_yticks(np.arange(0,QR_Code_size)-.5)
 ax.axes.xaxis.set_ticklabels([])
 ax.axes.yaxis.set_ticklabels([])
-ax.grid()
+ax.grid(linestyle='--')
+ax.imshow(QR_Code_Matrix, cmap='Greys')
+ax.set_aspect('equal')
 plt.show()

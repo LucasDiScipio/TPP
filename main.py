@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 
 # parametres pour la generation du QR code
-chaine = "kichta"
+chaine = "oui"
 mode = "byte"
-version = 7
-EC_lvl = 'Q'
+version = 1
+EC_lvl = 'L'
 version_and_EC_lvl = str(version) + '-' + EC_lvl
 
 # Error Correction Table
@@ -58,5 +58,5 @@ for i in range(0,groups_number):
         groups_list[i].blocks_list[j].EC_codewords_list = EC_codewords_generator(message_polynomial, generator_polynomial, df_Antilog_table, df_Log_table)
 
 # ENTRELACEMENT ET MESSAGE FINAL
-final_message = final_message(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits)
+final_message = final_message_generator(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits)
 
