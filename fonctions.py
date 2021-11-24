@@ -478,3 +478,32 @@ def mask(mask_number, row, column, bit):
         bit = bit ^ 1
 
     return bit
+
+def data_masking_condition_1(QR_Code_row_or_column, QR_Code_size):
+
+    penalty = 0
+    i = 0
+    while i <= QR_Code_size-5:
+
+        if np.min(QR_Code_row_or_column[i:i+5]) == np.max(QR_Code_row_or_column[i:i+5]):
+            
+            penalty += 3
+            i += 5
+
+            if i == QR_Code_size-1:
+                break
+
+            while QR_Code_row_or_column[i] == QR_Code_row_or_column[i-1]:
+
+                penalty += 1
+
+                if i == QR_Code_size-1:
+                    break
+
+                i += 1
+
+        else:
+
+            i += 1
+    
+    return penalty
