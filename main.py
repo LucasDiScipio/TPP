@@ -1,4 +1,3 @@
-from typing import final
 from fonctions import *
 import pandas as pd
 import numpy as np
@@ -6,7 +5,7 @@ import numpy as np
 # parametres pour la generation du QR code
 chaine = "oui"
 mode = "byte"
-version = 1
+version = 7
 EC_lvl = 'L'
 version_and_EC_lvl = str(version) + '-' + EC_lvl
 
@@ -38,6 +37,15 @@ data_codewords = data_encoding(chaine, mode, version, EC_lvl)
 # separation des mots codes en groupes et blocs
 groups_list = break_data_codewords_into_blocks(data_codewords, version, EC_lvl)
 
+# Format and Version String Tables
+df_Version_Information_Strings = pd.read_csv("./data/Version Information Strings.csv", delimiter=';', index_col='Version').astype({"Version Information String": str})
+df_Format_Information_Strings = pd.read_csv("./data/Format Information Strings.csv", delimiter=';', index_col = ['ECC Level',  'Mask Pattern']).astype({"Type Information Bits": str})
+
+print(df_Version_Information_Strings)
+print(df_Format_Information_Strings)
+
+exit()
+
 # GENERATION DES MOTS CORRECTEURS
 # groupe courant
 groups_number = len(groups_list)
@@ -60,3 +68,11 @@ for i in range(0,groups_number):
 # ENTRELACEMENT ET MESSAGE FINAL
 final_message = final_message_generator(version, version_and_EC_lvl, degree_generator_polynomial, groups_number, groups_list, df_Error_correction_table, df_Versions_Required_Remainder_Bits)
 
+# GENERATION DU QR_CODE
+QR_Code_Matrix, QR_Code_size = QR_Code_Matrix_generator(version, final_message)
+
+# MEILLEUR MASK
+
+
+# AFFICHAGE
+render_QR_Code(QR_Code_Matrix, QR_Code_size)
