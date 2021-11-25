@@ -589,19 +589,6 @@ def compute_penalty_score(QR_Code_Matrix, QR_Code_size):
 
     return penalty_condition_1 + penalty_condition_2 + penalty_condition_3 + penalty_condition_4
 
-def render_QR_Code(QR_Code_Matrix, QR_Code_size):
-    # AFFICHAGE
-    fig, ax = plt.subplots()
-
-    # grille
-    ax.set_xticks(np.arange(0,QR_Code_size)-.5)
-    ax.set_yticks(np.arange(0,QR_Code_size)-.5)
-    ax.axes.xaxis.set_ticklabels([])
-    ax.axes.yaxis.set_ticklabels([])
-    ax.grid(linestyle='--')
-    ax.imshow(QR_Code_Matrix, cmap='Greys')
-    ax.set_aspect('equal')
-    plt.show()
 
 def finder_patterns_placement(QR_Code_Matrix):
 
@@ -710,21 +697,21 @@ def timing_patterns_placement(QR_Code_Matrix, QR_Code_size):
 
     return QR_Code_Matrix
 
-def data_placement(QR_Code_Matrix, QR_Code_size, final_message):
+def data_placement(QR_Code_Matrix, QR_Code_size, final_message, mask_number):
 
     current_bit = 0
     current_coordonates = [QR_Code_size-1,QR_Code_size-1]
     pattern_placement = ['upward', 'left']
 
     # PATTERN PLACEMENT
-    stop = 0
     while current_coordonates != [QR_Code_size-1,0] and current_coordonates[1] >= 0:
 
         # le module courant est disponible
         if QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] == .5:
             
             # placement du bit courant
-            QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
+            # QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
+            QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = mask(mask_number, current_coordonates[0], current_coordonates[1], final_message[current_bit])
 
             # mise a jour du bit courant
             current_bit += 1
@@ -762,7 +749,8 @@ def data_placement(QR_Code_Matrix, QR_Code_size, final_message):
             if QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] == .5:
                 
                 # placement du bit courant
-                QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
+                # QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
+                QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = mask(mask_number, current_coordonates[0], current_coordonates[1], final_message[current_bit])
 
                 # mise a jour du bit courant
                 current_bit += 1
@@ -784,8 +772,8 @@ def data_placement(QR_Code_Matrix, QR_Code_size, final_message):
             if QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] == .5:
                 
                 # placement du bit courant
-                QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
-
+                # QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = final_message[current_bit]
+                QR_Code_Matrix[current_coordonates[0],current_coordonates[1]] = mask(mask_number, current_coordonates[0], current_coordonates[1], final_message[current_bit])
                 # mise a jour du bit courant
                 current_bit += 1
 
@@ -795,7 +783,7 @@ def data_placement(QR_Code_Matrix, QR_Code_size, final_message):
     return QR_Code_Matrix
 
 
-def QR_Code_Matrix_generator(version, final_message):
+def QR_Code_Matrix_generator(version, final_message, mask_pattern):
     
     # taille qr code
     # version = 7
@@ -829,6 +817,70 @@ def QR_Code_Matrix_generator(version, final_message):
     QR_Code_Matrix = timing_patterns_placement(QR_Code_Matrix, QR_Code_size)
 
     # DATA PLACEMENT
-    QR_Code_Matrix = data_placement(QR_Code_Matrix, QR_Code_size, final_message)
+    QR_Code_Matrix = data_placement(QR_Code_Matrix, QR_Code_size, final_message, mask_pattern)
 
     return QR_Code_Matrix, QR_Code_size
+
+
+def get_type_information_bits(EC_lvl, mask_pattern, df_Format_Information_Strings):
+
+    type_information_bits = bitarray('000000000000000')
+    type_information_bits[-len(bitarray(df_Format_Information_Strings.loc[EC_lvl, mask_pattern][0])):] = bitarray(df_Format_Information_Strings.loc[EC_lvl, mask_pattern][0])
+    
+    return type_information_bits
+
+
+def get_version_information_string(version, df_Version_Information_Strings):
+
+    version_information_string = bitarray('000000000000000000')
+    version_information_string[-len(bitarray(df_Version_Information_Strings.loc[version][0])):] = bitarray(df_Version_Information_Strings.loc[version][0])
+
+    return version_information_string
+ 
+
+def type_information_bits_placement(QR_Code_Matrix, type_information_bits):
+
+    # conversion en liste
+    type_information_bits = type_information_bits.tolist()
+
+    # haut-gauche
+    QR_Code_Matrix[8,0:6] = type_information_bits[0:6]
+    QR_Code_Matrix[8,7:9] = type_information_bits[6:8]
+    QR_Code_Matrix[7,8] = type_information_bits[8]
+    QR_Code_Matrix[0:6,8] = type_information_bits[9:][::-1]
+
+    # haut-droit
+    QR_Code_Matrix[8,-8:] = type_information_bits[-8:]
+
+    # bas-gauche
+    QR_Code_Matrix[-7:,8] = type_information_bits[0:7][::-1]
+
+    return QR_Code_Matrix
+
+def version_information_string_placement(QR_Code_Matrix, version_information_string):
+
+    # 
+    version_information_string = np.array(version_information_string.tolist()[::-1]).reshape(6, 3)
+
+    # haut-droit
+    QR_Code_Matrix[0:6, -11:-8] = version_information_string
+
+    # bas-gauche
+    QR_Code_Matrix[-11:-8,0:6] =  version_information_string.transpose()
+
+    return QR_Code_Matrix
+
+def render_QR_Code(QR_Code_Matrix):
+    # AFFICHAGE
+    fig, ax = plt.subplots()
+
+    # grille
+    # ax.set_xticks(np.arange(0,QR_Code_size)-.5)
+    # ax.set_yticks(np.arange(0,QR_Code_size)-.5)
+    # ax.axes.xaxis.set_ticklabels([])
+    # ax.axes.yaxis.set_ticklabels([])
+    # ax.grid(linestyle='--')
+    ax.imshow(QR_Code_Matrix, cmap='Greys')
+    ax.set_aspect('equal')
+    ax.axis("off")
+    plt.show()
