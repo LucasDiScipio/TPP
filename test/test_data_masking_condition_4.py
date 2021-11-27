@@ -1,7 +1,7 @@
 from fonctions import data_masking_condition_4
 import numpy as np
 
-def test_data_masking_condition_4():
+def test_data_masking_condition_4_thonky_example():
     dark_modules = np.ones((1,213))
     white_modules = np.zeros((1,228))
     QR_Code_Matrix = np.append(dark_modules, white_modules).reshape((21,21))
