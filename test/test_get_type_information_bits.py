@@ -1,5 +1,5 @@
 from fonctions import get_type_information_bits
-from bitarray import *
+from bitarray import bitarray
 import pandas as pd
 
 df_Format_Information_Strings = pd.read_csv("./data/Format Information Strings.csv", delimiter=';', index_col = ['ECC Level',  'Mask Pattern']).astype({"Type Information Bits": str})
