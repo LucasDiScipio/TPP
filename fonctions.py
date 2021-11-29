@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def string_to_binary(chaine):
+def byte_mode_encoding(chaine):
     """ Encode les caracteres de la chaine en mots de 8 bits
     
     INPUT
@@ -185,8 +185,8 @@ def data_encoding(chaine, mode, version, EC_lvl):
     ------
     - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
     """
-
-    liste = string_to_binary(chaine)
+    if mode == "byte":
+        liste = byte_mode_encoding(chaine)
     liste = add_mode_indicator(liste, mode)
     liste = add_character_count_indicator(chaine, liste, mode, version)
     liste = add_terminator_padBytes(liste, version, EC_lvl)
@@ -696,6 +696,7 @@ def timing_patterns_placement(QR_Code_Matrix, QR_Code_size):
     QR_Code_Matrix[8:QR_Code_size-8,6] = Alternating_Pattern
 
     return QR_Code_Matrix
+
 
 def data_placement(QR_Code_Matrix, QR_Code_size, final_message, mask_number):
 
