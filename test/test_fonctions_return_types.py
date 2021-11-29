@@ -1,7 +1,7 @@
 from fonctions import *
 
-def test_string_to_binary_return_type():
-    assert isinstance(string_to_binary("test"), list)
+def test_byte_mode_encoding_return_type():
+    assert isinstance(byte_mode_encoding("test"), list)
 
 def test_add_mode_indicator_return_type_numeric():
     assert isinstance(add_mode_indicator([], mode='numeric'), list)
