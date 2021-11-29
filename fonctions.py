@@ -33,6 +33,42 @@ def byte_mode_encoding(chaine):
     return encodage
 
 
+def alphanumeric_mode_encoding(chaine):
+
+    # alphanumeric table
+    alphanumeric_table = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 
+                        'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18, 'J': 19, 
+                        'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25, 'Q': 26, 'R': 27, 'S': 28, 'T': 29,
+                        'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35, ' ': 36, '$': 37, '%': 38, '*': 39,
+                        '+': 40, '-': 41, '.': 42, '/': 43, ':': 44}
+
+    # encodage
+    encodage = []
+
+    # separer la chaine en paires de caracteres
+    pairs = [chaine[index : index + 2] for index in range(0, len(chaine), 2)]
+
+    for pair in pairs:
+
+        if len(pair) % 2 == 0:
+
+            encodage.append(bitarray(format(alphanumeric_table[pair[0]]*45 + alphanumeric_table[pair[1]],'b')))
+
+            # ajout eventuel de bits nuls de sorte a obtenir des mots de 11 bits
+            while len(encodage[-1]) < 11:
+                encodage[-1] = bitarray('0') + encodage[-1]
+
+        else:
+
+            encodage.append(bitarray(format(alphanumeric_table[pair],'b')))
+
+            # ajout eventuel de bits nuls de sorte a obtenir un mot de 6 bits
+            while len(encodage[-1]) < 6:
+                encodage[-1] = bitarray('0') + encodage[-1]
+    
+    return encodage
+
+
 def add_mode_indicator(liste, mode):
     """ Ajoute le mode d'encodage au debut de liste
     
@@ -49,7 +85,7 @@ def add_mode_indicator(liste, mode):
                        'alphanumeric': bitarray('0010'),
                        'byte': bitarray('0100'),
                        'kanji': bitarray('1000')}
-    
+
     liste = [mode_indicators[mode]] + liste
 
     return liste
@@ -139,6 +175,7 @@ def add_terminator_padBytes(liste, version, EC_lvl):
     # ajout des bits nuls eventuels en fin de message
     if total_bits_number - bits_number >= 4:
         terminator = 4*bitarray('0')
+
     elif total_bits_number - bits_number !=0:
         terminator = (total_bits_number - bits_number)*bitarray('0')
     
@@ -148,7 +185,7 @@ def add_terminator_padBytes(liste, version, EC_lvl):
     # ajout des pad bytes eventuels en fin de message
     # ajout des bits tq bits_number % 8 == 0
     if bits_number % 8 != 0:
-        liste = liste + [(bits_number % 8)*bitarray('0')]
+        liste = liste + [(8 - (bits_number % 8))*bitarray('0')]
         bits_number += bits_number % 8
 
     # ajout des bits de sorte a atteindre la capacite maximum
@@ -187,6 +224,10 @@ def data_encoding(chaine, mode, version, EC_lvl):
     """
     if mode == "byte":
         liste = byte_mode_encoding(chaine)
+
+    elif mode == "alphanumeric":
+        liste = alphanumeric_mode_encoding(chaine)
+
     liste = add_mode_indicator(liste, mode)
     liste = add_character_count_indicator(chaine, liste, mode, version)
     liste = add_terminator_padBytes(liste, version, EC_lvl)
@@ -586,6 +627,11 @@ def compute_penalty_score(QR_Code_Matrix, QR_Code_size):
 
     # Evaluation Condition #4
     penalty_condition_4 = data_masking_condition_4(QR_Code_Matrix, QR_Code_size)
+
+    print(f"penalty_condition_1 : {penalty_condition_1}")
+    print(f"penalty_condition_2 : {penalty_condition_2}")
+    print(f"penalty_condition_3 : {penalty_condition_3}")
+    print(f"penalty_condition_4 : {penalty_condition_4}")
 
     return penalty_condition_1 + penalty_condition_2 + penalty_condition_3 + penalty_condition_4
 
