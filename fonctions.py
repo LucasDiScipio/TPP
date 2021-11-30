@@ -276,7 +276,7 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
             for k in range(0, data_codewords_number):
 
                 # ajout du mot code courant
-                codeword = data_codewords[compteur:compteur+7]
+                codeword = data_codewords[compteur:compteur+8]
                 codewords_list.append(codeword)
                 
                 compteur += 8
