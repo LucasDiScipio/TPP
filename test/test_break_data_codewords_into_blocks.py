@@ -12,10 +12,43 @@ data_codewords += bitarray('00010001 11101100')
 
 def test_break_data_codewords_into_blocks_thonky_5Q_group1_block1():
      correct_codewords_list = [bitarray('01000011'), bitarray('01010101'), bitarray('01000110'), bitarray('10000110'), 
-                                   bitarray('01010111'), bitarray('00100110'), bitarray('01010101'), bitarray('11000010'), 
-                                   bitarray('01110111'), bitarray('00110010'), bitarray('00000110'), bitarray('00010010'), 
-                                   bitarray('00000110'), bitarray('01100111'), bitarray('00100110')]
+                               bitarray('01010111'), bitarray('00100110'), bitarray('01010101'), bitarray('11000010'), 
+                               bitarray('01110111'), bitarray('00110010'), bitarray('00000110'), bitarray('00010010'), 
+                               bitarray('00000110'), bitarray('01100111'), bitarray('00100110')]
      
      groups_list = break_data_codewords_into_blocks(data_codewords=data_codewords, version=5, EC_lvl='Q')
 
      assert groups_list[0].blocks_list[0].codewords_list == correct_codewords_list
+
+
+def test_break_data_codewords_into_blocks_thonky_5Q_group1_block2():
+     correct_codewords_list = [bitarray('11110110'), bitarray('11110110'), bitarray('01000010'), bitarray('00000111'), 
+                               bitarray('01110110'), bitarray('10000110'), bitarray('11110010'), bitarray('00000111'), 
+                               bitarray('00100110'), bitarray('01010110'), bitarray('00010110'), bitarray('11000110'), 
+                               bitarray('11000111'), bitarray('10010010'), bitarray('00000110')]
+     
+     groups_list = break_data_codewords_into_blocks(data_codewords=data_codewords, version=5, EC_lvl='Q')
+
+     assert groups_list[0].blocks_list[1].codewords_list == correct_codewords_list
+
+
+def test_break_data_codewords_into_blocks_thonky_5Q_group2_block1():
+     correct_codewords_list = [bitarray('10110110'), bitarray('11100110'), bitarray('11110111'), bitarray('01110111'), 
+                               bitarray('00110010'), bitarray('00000111'), bitarray('01110110'), bitarray('10000110'), 
+                               bitarray('01010111'), bitarray('00100110'), bitarray('01010010'), bitarray('00000110'), 
+                               bitarray('10000110'), bitarray('10010111'), bitarray('00110010'), bitarray('00000111')]
+     
+     groups_list = break_data_codewords_into_blocks(data_codewords=data_codewords, version=5, EC_lvl='Q')
+
+     assert groups_list[1].blocks_list[0].codewords_list == correct_codewords_list
+
+
+def test_break_data_codewords_into_blocks_thonky_5Q_group2_block2():
+     correct_codewords_list = [bitarray('01000110'), bitarray('11110111'), bitarray('01110110'), bitarray('01010110'), 
+                               bitarray('11000010'), bitarray('00000110'), bitarray('10010111'), bitarray('00110010'), 
+                               bitarray('11100000'), bitarray('11101100'), bitarray('00010001'), bitarray('11101100'), 
+                               bitarray('00010001'), bitarray('11101100'), bitarray('00010001'), bitarray('11101100')]
+     
+     groups_list = break_data_codewords_into_blocks(data_codewords=data_codewords, version=5, EC_lvl='Q')
+
+     assert groups_list[1].blocks_list[1].codewords_list == correct_codewords_list
