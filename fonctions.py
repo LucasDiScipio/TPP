@@ -308,7 +308,7 @@ def generate_message_polynomial(block):
     coefficients_list = []
     for codeword in codewords_list:
         coefficients_list.append(ba2int(codeword))
-    coefficients_list.reverse()
+    # coefficients_list.reverse()
 
     # generation du polynome messager
     message_polynomial = np.array(coefficients_list)

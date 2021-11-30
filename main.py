@@ -5,10 +5,10 @@ import numpy as np
 
 
 # parametres pour la generation du QR code
-chaine = "yeet"
+chaine = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=OLAK5uy_lyL1tS_aFGwO7Sk3T97zxofVmMJmUxrJM"
 mode = "byte"
-version = 7
-EC_lvl = 'L'
+version = 9
+EC_lvl = 'H'
 version_and_EC_lvl = str(version) + '-' + EC_lvl
 
 # Error Correction Table
@@ -77,7 +77,6 @@ for mask_pattern in range(0,8):
     QR_Code_Matrix = type_information_bits_placement(QR_Code_Matrix, type_information_bits)
 
     # version information string placement
-
     if version >= 7:
         version_information_string = get_version_information_string(version, df_Version_Information_Strings)
         QR_Code_Matrix = version_information_string_placement(QR_Code_Matrix, version_information_string)
