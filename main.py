@@ -8,7 +8,7 @@ import numpy as np
 chaine = "A123003023403"
 mode = choose_most_efficient_mode(chaine)
 EC_lvl = 'H'
-version = 7
+version = determine_smallest_version(chaine, EC_lvl, mode)
 version_and_EC_lvl = f"{version}-{EC_lvl}"
 
 # Error Correction Table

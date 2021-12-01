@@ -6,14 +6,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def determine_smallest_version(chaine, EC_lvl):
+def determine_smallest_version(chaine, EC_lvl, mode):
+
+    characters_number = len(chaine)
+
     df_Character_Capacities = pd.read_csv('./data/Character Capacities Table.csv', delimiter=',', index_col=['Version','Error Correction Level'])
     
     version = 1
+    while df_Character_Capacities.loc[(version, EC_lvl), mode] < characters_number:
+        version += 1
 
-    while df_Character_Capacities.loc[]
-
-    return df_Character_Capacities
+    return version
 
 
 def choose_most_efficient_mode(chaine):
