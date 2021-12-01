@@ -6,6 +6,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+def choose_most_efficient_mode(chaine):
+
+    # alphanumeric table
+    alphanumeric_table = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 
+                        'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18, 'J': 19, 
+                        'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25, 'Q': 26, 'R': 27, 'S': 28, 'T': 29,
+                        'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35, ' ': 36, '$': 37, '%': 38, '*': 39,
+                        '+': 40, '-': 41, '.': 42, '/': 43, ':': 44}
+    
+    if chaine.isdecimal():
+        mode = 'numeric'
+    
+    elif all(characters in alphanumeric_table for characters in chaine):
+        mode = 'alphanumeric'
+    
+    return mode
+
+
 def byte_mode_encoding(chaine):
     """ Encode les caracteres de la chaine en mots de 8 bits
     
@@ -920,13 +938,6 @@ def version_information_string_placement(QR_Code_Matrix, version_information_str
 def render_QR_Code(QR_Code_Matrix):
     # AFFICHAGE
     fig, ax = plt.subplots()
-
-    # grille
-    # ax.set_xticks(np.arange(0,QR_Code_size)-.5)
-    # ax.set_yticks(np.arange(0,QR_Code_size)-.5)
-    # ax.axes.xaxis.set_ticklabels([])
-    # ax.axes.yaxis.set_ticklabels([])
-    # ax.grid(linestyle='--')
     ax.imshow(QR_Code_Matrix, cmap='Greys')
     ax.set_aspect('equal')
     ax.axis("off")

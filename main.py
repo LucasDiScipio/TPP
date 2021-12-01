@@ -5,11 +5,11 @@ import numpy as np
 
 
 # parametres pour la generation du QR code
-chaine = "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=OLAK5uy_lyL1tS_aFGwO7Sk3T97zxofVmMJmUxrJM"
+chaine = "U BLENDER"
 mode = "byte"
-version = 9
+version = 7
 EC_lvl = 'H'
-version_and_EC_lvl = str(version) + '-' + EC_lvl
+version_and_EC_lvl = f"{version}-{EC_lvl}"
 
 # Error Correction Table
 df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
@@ -19,7 +19,7 @@ alpha_exponents = np.arange(256, dtype=np.uint8)
 integers = np.zeros(256, dtype=np.uint8)
 integers[0] = 1
 for k in range(1,256):
-
+# version_and_EC_lvl = str(version) + '-' + EC_lvl
     if integers[k-1]*2 > 255:
         integers[k] = int(integers[k-1]) * 2 ^ 285 
 
