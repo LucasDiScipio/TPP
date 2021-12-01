@@ -5,10 +5,10 @@ import numpy as np
 
 
 # parametres pour la generation du QR code
-chaine = "U BLENDER"
-mode = "byte"
-version = 7
+chaine = "A123003023403"
+mode = choose_most_efficient_mode(chaine)
 EC_lvl = 'H'
+version = 7
 version_and_EC_lvl = f"{version}-{EC_lvl}"
 
 # Error Correction Table

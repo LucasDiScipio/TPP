@@ -6,20 +6,34 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+def determine_smallest_version(chaine, EC_lvl):
+    df_Character_Capacities = pd.read_csv('./data/Character Capacities Table.csv', delimiter=',', index_col=['Version','Error Correction Level'])
+    
+    version = 1
+
+    while df_Character_Capacities.loc[]
+
+    return df_Character_Capacities
+
+
 def choose_most_efficient_mode(chaine):
 
     # alphanumeric table
     alphanumeric_table = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 
-                        'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18, 'J': 19, 
-                        'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25, 'Q': 26, 'R': 27, 'S': 28, 'T': 29,
-                        'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35, ' ': 36, '$': 37, '%': 38, '*': 39,
-                        '+': 40, '-': 41, '.': 42, '/': 43, ':': 44}
+                          'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15, 'G': 16, 'H': 17, 'I': 18, 'J': 19, 
+                          'K': 20, 'L': 21, 'M': 22, 'N': 23, 'O': 24, 'P': 25, 'Q': 26, 'R': 27, 'S': 28, 'T': 29,
+                          'U': 30, 'V': 31, 'W': 32, 'X': 33, 'Y': 34, 'Z': 35, ' ': 36, '$': 37, '%': 38, '*': 39,
+                          '+': 40, '-': 41, '.': 42, '/': 43, ':': 44}
     
     if chaine.isdecimal():
         mode = 'numeric'
     
     elif all(characters in alphanumeric_table for characters in chaine):
         mode = 'alphanumeric'
+
+    else:
+        mode = 'byte'
+    
     
     return mode
 
@@ -86,6 +100,52 @@ def alphanumeric_mode_encoding(chaine):
     
     return encodage
 
+
+def numeric_mode_encoding(chaine):
+    
+    # encodage
+    encodage = []
+
+    # separer la chaine en paires de caracteres
+    triplets = [chaine[index : index + 3] for index in range(0, len(chaine), 3)]
+
+    for triplet in triplets:
+
+        if len(triplet) == 3:
+
+            if triplet[:2] == '00':
+                encodage.append(bitarray(format(int(triplet[2]),'b'))) 
+
+            elif triplet[0] == '0':
+                encodage.append(bitarray(format(int(triplet[1:]),'b')))
+
+            else:
+                encodage.append(bitarray(format(int(triplet),'b')))
+            
+            # ajout eventuel de bits nuls de sorte a obtenir un mot de 10 bits
+            while len(encodage[-1]) < 10:
+                encodage[-1] = bitarray('0') + encodage[-1]
+
+        elif len(triplet) == 2:
+            
+            if triplet[0] == '0':
+                encodage.append(bitarray(format(int(triplet[1]),'b')))
+
+            else:
+                encodage.append(bitarray(format(int(triplet),'b')))
+
+            # ajout eventuel de bits nuls de sorte a obtenir un mot de 7 bits
+            while len(encodage[-1]) < 7:
+                encodage[-1] = bitarray('0') + encodage[-1]
+        
+        else:
+            encodage.append(bitarray(format(int(triplet),'b')))
+
+            # ajout eventuel de bits nuls de sorte a obtenir un mot de 4 bits
+            while len(encodage[-1]) < 4:
+                encodage[-1] = bitarray('0') + encodage[-1]            
+
+    return encodage
 
 def add_mode_indicator(liste, mode):
     """ Ajoute le mode d'encodage au debut de liste
@@ -240,11 +300,14 @@ def data_encoding(chaine, mode, version, EC_lvl):
     ------
     - data_codewords : type -> bitarray, les mots codes binaires encodes et concatenes
     """
-    if mode == "byte":
+    if mode == 'byte':
         liste = byte_mode_encoding(chaine)
 
-    elif mode == "alphanumeric":
+    elif mode == 'alphanumeric':
         liste = alphanumeric_mode_encoding(chaine)
+
+    elif mode == 'numeric':
+        liste = numeric_mode_encoding(chaine)
 
     liste = add_mode_indicator(liste, mode)
     liste = add_character_count_indicator(chaine, liste, mode, version)
