@@ -245,7 +245,7 @@ def add_terminator_padBytes(liste, version, EC_lvl):
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
 
     # nombre total de bits necessaires pour le QR code
-    version_and_EC_lvl = str(version) + '-' + EC_lvl
+    version_and_EC_lvl = f"{version}-{EC_lvl}"
     total_bits_number = 8*int(df_Error_correction_table.loc[version_and_EC_lvl]['Total Number of Data Codewords for this Version and EC Level'])
 
     # calcul du nombre de bits de la liste
@@ -340,7 +340,7 @@ def break_data_codewords_into_blocks(data_codewords, version, EC_lvl):
     df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
 
     # separation en groupes
-    version_and_EC_lvl = str(version) + '-' + EC_lvl
+    version_and_EC_lvl = f"{version}-{EC_lvl}"
     groups_number = int(pd.notnull(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group 1'])) + int(pd.notnull(df_Error_correction_table.loc[version_and_EC_lvl, 'Number of Blocks in Group 2']))
     groups_list = []
     compteur = 0
@@ -711,11 +711,6 @@ def compute_penalty_score(QR_Code_Matrix, QR_Code_size):
 
     # Evaluation Condition #4
     penalty_condition_4 = data_masking_condition_4(QR_Code_Matrix, QR_Code_size)
-
-    print(f"penalty_condition_1 : {penalty_condition_1}")
-    print(f"penalty_condition_2 : {penalty_condition_2}")
-    print(f"penalty_condition_3 : {penalty_condition_3}")
-    print(f"penalty_condition_4 : {penalty_condition_4}")
 
     return penalty_condition_1 + penalty_condition_2 + penalty_condition_3 + penalty_condition_4
 

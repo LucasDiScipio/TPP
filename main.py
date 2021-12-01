@@ -1,47 +1,19 @@
+from tables import *
 from fonctions import *
 from bitarray import *
-import pandas as pd
-import numpy as np
-
 
 # parametres pour la generation du QR code
-chaine = "A123003023403"
+chaine = "gang"
+EC_lvl = 'L'
 mode = choose_most_efficient_mode(chaine)
-EC_lvl = 'H'
 version = determine_smallest_version(chaine, EC_lvl, mode)
 version_and_EC_lvl = f"{version}-{EC_lvl}"
-
-# Error Correction Table
-df_Error_correction_table = pd.read_csv("./data/Error Correction Table.csv", index_col="Version and EC Level")
-
-# generation des tables log et antilog
-alpha_exponents = np.arange(256, dtype=np.uint8)
-integers = np.zeros(256, dtype=np.uint8)
-integers[0] = 1
-for k in range(1,256):
-# version_and_EC_lvl = str(version) + '-' + EC_lvl
-    if integers[k-1]*2 > 255:
-        integers[k] = int(integers[k-1]) * 2 ^ 285 
-
-    else:
-        integers[k] = integers[k-1] * 2
-
-df_Antilog_table = pd.DataFrame(data=integers, columns=['integer'], index=alpha_exponents)
-df_Antilog_table.index.name = 'exponent'
-df_Log_table = pd.DataFrame(df_Antilog_table.index.values, columns=['exponent'], index=df_Antilog_table.integer).iloc[0:255, :].sort_index()
-
-# List of Versions and Required Remainder Bits
-df_Versions_Required_Remainder_Bits = pd.read_csv("./data/Versions and Required Remainder Bits.csv", delimiter=';', index_col='QR Version')
 
 # encodage de la chaine de caracteres
 data_codewords = data_encoding(chaine, mode, version, EC_lvl)
 
 # separation des mots codes en groupes et blocs
 groups_list = break_data_codewords_into_blocks(data_codewords, version, EC_lvl)
-
-# Format and Version String Tables
-df_Format_Information_Strings = pd.read_csv("./data/Format Information Strings.csv", delimiter=';', index_col = ['ECC Level',  'Mask Pattern']).astype({"Type Information Bits": str})
-df_Version_Information_Strings = pd.read_csv("./data/Version Information Strings.csv", delimiter=';', index_col='Version').astype({"Version Information String": str})
 
 # GENERATION DES MOTS CORRECTEURS
 # groupe courant
