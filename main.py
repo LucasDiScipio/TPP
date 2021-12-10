@@ -1,9 +1,18 @@
 from tables import *
 from fonctions import *
 from bitarray import *
+from sys import argv
 
 # parametres pour la generation du QR code
-chaine = "gang"
+line_to_read = int(argv[1])-1
+with open('./data/QR_CODES_LIST.txt','r') as f:
+
+    for position, line in enumerate(f):
+
+        if position == line_to_read:
+            print(line)
+            chaine = line
+            break
 EC_lvl = 'L'
 mode = choose_most_efficient_mode(chaine)
 version = determine_smallest_version(chaine, EC_lvl, mode)
@@ -64,5 +73,10 @@ for mask_pattern in range(0,8):
         QR_Code_Matrix_final_score = QR_Code_Matrix_score
         QR_Code_Matrix_final = QR_Code_Matrix
 
-# AFFICHAGE
-render_QR_Code(QR_Code_Matrix_final)
+# SAUVEGARDE DU QR CODE
+fig, ax = plt.subplots()
+ax.imshow(QR_Code_Matrix, cmap='Greys')
+ax.set_aspect('equal')
+ax.axis("off")
+if line_to_read != 9999 : plt.title(chaine)
+plt.savefig("./QRCODES/QRCODE_#{0:05d}.jpeg".format(line_to_read), bbox_inches="tight")
