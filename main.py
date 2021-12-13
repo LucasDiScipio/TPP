@@ -4,7 +4,7 @@ from bitarray import *
 from sys import argv
 
 # parametres pour la generation du QR code
-line_to_read = int(argv[1])-1
+line_to_read = int(argv[1])-1 + int(argv[2])*1000
 with open('./data/QR_CODES_LIST.txt','r') as f:
 
     for position, line in enumerate(f):
